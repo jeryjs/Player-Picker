@@ -1,7 +1,7 @@
 ;@Ahk2Exe-SetName		Video Picker
 ;@Ahk2Exe-SetProductName	Video Picker
 ;@Ahk2Exe-SetDescription	Video Picker - Lets you set upto 5 different Video players`, all selectable by a hotkey [1-5]
-;@Ahk2Exe-SetVersion		1.3-alpha
+;@Ahk2Exe-SetVersion		1.4-alpha
 ;@Ahk2Exe-SetOrigFilename	Video-Picker.ahk
 ;@Ahk2Exe-SetCompanyName	Jery
 
@@ -23,8 +23,13 @@ SetBatchLines -1
 #Persistent
 ; #NoTrayIcon
 SetWorkingDir %A_ScriptDir%		;\Working-Directory\Video-Picker
+
+Global Player1_Hotkey, Global Player2_Hotkey, Global Player3_Hotkey, Global Player4_Hotkey, Global Player5_Hotkey
+Global Player1_Path, Global Player2_Path, Global Player3_Path, Global Player4_Path, Global Player5_Path
+Global Player1_Icon, Global Player2_Icon, Global Player3_Icon, Global Player4_Icon, Global Player5_Icon
+Global ColorChoice
+
 Ini_Read()
-Settings_Icon := "Assets\Settings-Icon.ico"
 
 ;--------CONFIG-------------------------------------------------
 ; Player1_Path := "Z:\DO_NOT_TOUCH\Applications\MPV\mpv.exe"
@@ -49,23 +54,36 @@ Loop, %0%
    param .= %A_Index% A_Space
 File_Path := Trim(param)
 
+Settings_Icon := "Assets\Settings-Icon.ico"
+
+;--------Hotkeys-------------------------------------------------
+#If (WinExist("ahk_id " MainWindow) AND !WinExist("ahk_id " HWNDMainWindow))
+Hotkey, %Player1_Hotkey%, Player1
+Hotkey, %Player2_Hotkey%, Player2
+Hotkey, %Player3_Hotkey%, Player3
+Hotkey, %Player4_Hotkey%, Player4
+Hotkey, %Player5_Hotkey%, Player5
+#If
+
 
 ;--------MainWindow (GUI 1)-------------------------------------------------
 MainWindow:
 	Gui, +Owner%scHwnd%
 	Gui +HWNDMainWindow +LastFound +AlwaysOnTop +ToolWindow
-	Gui, Color, FFFFFF
+	If (ColorChoice = "Transparent")
+		ColorChoice := 1
+	Gui, Color, %ColorChoice%
 	WinSet, TransColor, 1 230
 
-	If (Player1_Icon != "")
+	If (Player1_Icon != " ")
 		Gui, Add, Picture, x0 w-1 h80 gPlayer1, %Player1_Icon%
-	If (Player2_Icon != "")
+	If (Player2_Icon != " ")
 		Gui, Add, Picture, x+30 w-1 h80 gPlayer2, %Player2_Icon%
-	If (Player3_Icon != "")
+	If (Player3_Icon != " ")
 		Gui, Add, Picture, x+30 w-1 h80 gPlayer3, %Player3_Icon%
-	If (Player4_Icon != "")
+	If (Player4_Icon != " ")
 		Gui, Add, Picture, x+30 w-1 h80 gPlayer4, %Player4_Icon%
-	If (Player5_Icon != "")
+	If (Player5_Icon != " ")
 		Gui, Add, Picture, x+30 w-1 h80 gPlayer5, %Player5_Icon%
 		
 	Gui Add, Picture, x+30 y60 w-1 h30 gSettings, %Settings_Icon%
@@ -120,8 +138,8 @@ Settings:
 	Gui, Settings: Add, ComboBox, x+15 y380 w120 vColorChoice Simple, Black|White|Transparent|00FFFF|808080
 	Gui, Settings: Add, Text, x+10 y380, (You can also add your own 'Hex' Code for any Color)
 	
-	Gui, Settings: Add, Button, Default x520 y460 w80 gButton_Cancel, &Cancel
-	Gui, Settings: Add, Button, Default x620 y460 w80 gButton_Submit, &Submit
+	Gui, Settings: Add, Button, Default x520 y460 w80, &Cancel
+	Gui, Settings: Add, Button, Default x620 y460 w80, &Submit
 
 	Gui, Settings: Show, w720 h500, Settings
 Return
@@ -150,11 +168,11 @@ Return
 
 
 ;SubRoutines for GUI 2 (SETTINGS)
-Button_Cancel:
+SettingsButtonCancel:
 	Gui, Settings: Destroy
 	Goto, MainWindow
 Return
-Button_Submit:
+SettingsButtonSubmit:
 	; MsgBox, You Pressed Submit
 	Gui, Settings: Submit
 	Ini_Write()
@@ -166,12 +184,12 @@ Return
 
 
 ;--------Hotkeys-------------------------------------------------
-#If (WinExist("ahk_id " MainWindow) AND !WinExist("ahk_id " HWNDMainWindow))
-1::Goto, Player1
-2::Goto, Player2
-3::Goto, Player3
-4::Goto, Player4
-5::Goto, Player5
+; #If (WinExist("ahk_id " MainWindow) AND !WinExist("ahk_id " HWNDMainWindow))
+; 1::Goto, Player1
+; 2::Goto, Player2
+; 3::Goto, Player3
+; 4::Goto, Player4
+; 5::Goto, Player5
 !s::Goto, Settings
 
 
@@ -185,29 +203,29 @@ Return
 
 
 
-
+!h::IniRead, Player1_Hotkey, config.ini, Player_1, Player1_Hotkey, 1
 
 ;--------Ini Settings-------------------------------------------------
 Ini_Read() {
 	IniRead, Player1_Hotkey, config.ini, Player_1, Player1_Hotkey, 1
-	IniRead, Player1_Path, config.ini, Player_1, Player1_Path, A_ProgramFiles\Windows Media Player\wmplayer.exe
-	IniRead, Player1_Icon, config.ini, Player_1, Player1_Icon, A_ProgramFiles\Windows Media Player\wmplayer.exe
-	MsgBox, %Player1_Hotkey%`n%Player1_Path%`n%Player1_Icon%
+	IniRead, Player1_Path, config.ini, Player_1, Player1_Path, %A_ProgramFiles%\Windows Media Player\wmplayer.exe
+	IniRead, Player1_Icon, config.ini, Player_1, Player1_Icon, %A_ProgramFiles%\Windows Media Player\wmplayer.exe
+	
 	IniRead, Player2_Hotkey, config.ini, Player_2, Player2_Hotkey, 2
-	IniRead, Player2_Path, config.ini, Player_2, Player2_Path, Z:\DO_NOT_TOUCH\Applications\MPV\mpv.exe
-	IniRead, Player2_Icon, config.ini, Player_2, Player2_Icon, "Z:\DO_NOT_TOUCH\Applications\MPV\mpv.exe"
+	IniRead, Player2_Path, config.ini, Player_2, Player2_Path, %A_Space%
+	IniRead, Player2_Icon, config.ini, Player_2, Player2_Icon, %A_Space%
 
 	IniRead, Player3_Hotkey, config.ini, Player_3, Player3_Hotkey, 3
-	IniRead, Player3_Path, config.ini, Player_3, Player3_Path, "Z:\DO_NOT_TOUCH\Applications\MPV\mpv.net\mpvnet.exe"
-	IniRead, Player3_Icon, config.ini, Player_3, Player3_Icon, "Z:\DO_NOT_TOUCH\Applications\MPV\mpv.net\mpvnet.exe"
+	IniRead, Player3_Path, config.ini, Player_3, Player3_Path, %A_Space%
+	IniRead, Player3_Icon, config.ini, Player_3, Player3_Icon, %A_Space%
 
 	IniRead, Player4_Hotkey, config.ini, Player_4, Player4_Hotkey, 4
-	IniRead, Player4_Path, config.ini, Player_4, Player4_Path, "Z:\DO_NOT_TOUCH\Applications\VLC\vlc.exe"
-	IniRead, Player4_Icon, config.ini, Player_4, Player4_Icon, "Z:\DO_NOT_TOUCH\Applications\VLC\vlc.exe"
+	IniRead, Player4_Path, config.ini, Player_4, Player4_Path, %A_Space%
+	IniRead, Player4_Icon, config.ini, Player_4, Player4_Icon, %A_Space%
 
 	IniRead, Player5_Hotkey, config.ini, Player_5, Player5_Hotkey, 5
-	IniRead, Player5_Path, config.ini, Player_5, Player5_Path, "A_ProgramFiles\Windows Media Player\wmplayer.exe"
-	IniRead, Player5_Icon, config.ini, Player_5, Player5_Icon, "A_ProgramFiles\Windows Media Player\wmplayer.exe"
+	IniRead, Player5_Path, config.ini, Player_5, Player5_Path, %A_Space%
+	IniRead, Player5_Icon, config.ini, Player_5, Player5_Icon, %A_Space%
 }
 
 Ini_Write() {
