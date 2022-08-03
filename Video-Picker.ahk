@@ -1,4 +1,4 @@
-﻿;@Ahk2Exe-SetName			Video Picker
+;@Ahk2Exe-SetName		Video Picker
 ;@Ahk2Exe-SetProductName	Video Picker
 ;@Ahk2Exe-SetDescription	Video Picker - Lets you set upto 5 different Video players`, all selectable by a hotkey [1-5]
 ;@Ahk2Exe-SetVersion		1.3-alpha
