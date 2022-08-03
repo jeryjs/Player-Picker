@@ -1,11 +1,11 @@
 ﻿;@Ahk2Exe-SetName			Video Picker
 ;@Ahk2Exe-SetProductName	Video Picker
 ;@Ahk2Exe-SetDescription	Video Picker - Lets you set upto 5 different Video players`, all selectable by a hotkey [1-5]
-;@Ahk2Exe-SetVersion		1.3.1
+;@Ahk2Exe-SetVersion		1.3-alpha
 ;@Ahk2Exe-SetOrigFilename	Video-Picker.ahk
 ;@Ahk2Exe-SetCompanyName	Jery
 
-;@Ahk2Exe-SetMainIcon Z:\OneDrive\AHK\Working-Directory\Video-Picker\Settings-Icon.ico
+;@Ahk2Exe-SetMainIcon %A_ScriptDir%\Assets\Settings-Icon.ico
 
 #NoEnv
 SetTitleMatchMode 2
@@ -24,7 +24,7 @@ SetBatchLines -1
 ; #NoTrayIcon
 SetWorkingDir %A_ScriptDir%		;\Working-Directory\Video-Picker
 Ini_Read()
-Settings_Icon := "Settings-Icon.ico"
+Settings_Icon := "Assets\Settings-Icon.ico"
 
 ;--------CONFIG-------------------------------------------------
 ; Player1_Path := "Z:\DO_NOT_TOUCH\Applications\MPV\mpv.exe"
