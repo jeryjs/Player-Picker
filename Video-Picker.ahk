@@ -1,11 +1,13 @@
 ;@Ahk2Exe-SetName		Video Picker
+;@Ahk2Exe-ExeName	Video Picker
 ;@Ahk2Exe-SetProductName	Video Picker
 ;@Ahk2Exe-SetDescription	Video Picker - Lets you set upto 5 different Video players`, all selectable by a hotkey [1-5]
-;@Ahk2Exe-SetVersion		0.2-alpha
+;@Ahk2Exe-SetVersion		0.2.1-alpha
 ;@Ahk2Exe-SetOrigFilename	Video-Picker.ahk
 ;@Ahk2Exe-SetCompanyName	Jery
 
-;@Ahk2Exe-SetMainIcon %A_ScriptDir%\Assets\Settings-Icon.ico
+;@Ahk2Exe-AddResource Assets\Settings-Icon.ico, Settings-Icon
+;@Ahk2Exe-SetMainIcon Assets\Settings-Icon.ico
 
 #NoEnv
 SetTitleMatchMode 2
@@ -22,7 +24,9 @@ SetBatchLines -1
 #SIngleInstance Force
 #Persistent
 ; #NoTrayIcon
-SetWorkingDir %A_ScriptDir%		;\Working-Directory\Video-Picker
+SetWorkingDir %A_ScriptDir%
+
+FileInstall, Assets\Settings-Icon.ico, %A_Temp%\Settings-Icon.ico
 
 Global Player1_Hotkey, Global Player2_Hotkey, Global Player3_Hotkey, Global Player4_Hotkey, Global Player5_Hotkey
 Global Player1_Path, Global Player2_Path, Global Player3_Path, Global Player4_Path, Global Player5_Path
@@ -42,7 +46,14 @@ Loop, %0%
    param .= %A_Index% A_Space
 File_Path := Trim(param)
 
-Settings_Icon := "Assets\Settings-Icon.ico"
+; Settings_Icon := "%A_Temp%\Settings-Icon.ico"
+if !A_IsCompiled
+	Settings_Icon := "Assets\Settings-Icon.ico"
+Else {
+	Settings_Icon := % "%A_Temp%\Settings-Icon.ico"
+	Settings_Icon := % "%A_Temp%\Settings-Icon.ico"
+	MsgBox, %Settings_Icon% `, "%A_Temp%\Settings-Icon.ico"
+}
 
 ;--------Hotkeys-------------------------------------------------
 #If (WinExist("Pick a Video Player to Play") AND !WinExist("Settings"))
@@ -79,7 +90,7 @@ Ini_Read()
 	If (Player5_Icon != "ERROR")
 		Gui, Add, Picture, x+30 w-1 hp gPlayer5, %Player5_Icon%
 		
-	Gui Add, Picture, x+30 y60 w-1 h30 gSettings, %Settings_Icon%
+	Gui Add, Picture, x+30 w-1 h30 gSettings, %Settings_Icon%
 	; Goto, Settings
 	Gui, Show, AutoSize, Pick a Video Player to Play "%File_Path%"
 Return
@@ -223,6 +234,11 @@ Ini_Read() {
 	IniRead, Player1_Hotkey, config.ini, Player_1, Player1_Hotkey, 1
 	IniRead, Player1_Path, config.ini, Player_1, Player1_Path, %A_ProgramFiles%\Windows Media Player\wmplayer.exe
 	IniRead, Player1_Icon, config.ini, Player_1, Player1_Icon, %A_ProgramFiles%\Windows Media Player\wmplayer.exe
+	If !RegExMatch(Player1_Path, ".exe")
+	{
+		IniWrite, %A_ProgramFiles%\Windows Media Player\wmplayer.exe, config.ini, Player_1, Player1_Path
+		IniWrite, %A_ProgramFiles%\Windows Media Player\wmplayer.exe, config.ini, Player_1, Player1_Icon
+	}
 	
 	IniRead, Player2_Hotkey, config.ini, Player_2, Player2_Hotkey, 2
 	IniRead, Player2_Path, config.ini, Player_2, Player2_Path
