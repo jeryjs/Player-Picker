@@ -2,7 +2,7 @@
 ;@Ahk2Exe-ExeName	Video Picker
 ;@Ahk2Exe-SetProductName	Video Picker
 ;@Ahk2Exe-SetDescription	Video Picker - Lets you set upto 5 different Video players`, all selectable by a hotkey [1-5]
-;@Ahk2Exe-SetVersion		0.2.1-alpha
+;@Ahk2Exe-SetVersion		0.2.3-alpha
 ;@Ahk2Exe-SetOrigFilename	Video-Picker.ahk
 ;@Ahk2Exe-SetCompanyName	Jery
 
@@ -91,57 +91,65 @@ Ini_Read()
 		Gui, Add, Picture, x+30 w-1 hp gPlayer5, %Player5_Icon%
 		
 	Gui Add, Picture, x+30 w-1 h30 gSettings, %Settings_Icon%
-	; Goto, Settings
+	Goto, Settings
 	Gui, Show, AutoSize, Pick a Video Player to Play "%File_Path%"
 Return
 
 ;--------Settings (Gui 2)-------------------------------------------------
 Settings:
 	Gui, 1: Destroy
+	Gui, Margin, x10
 	Gui, Settings: +HWNDSettingsWindow +AlwaysOnTop +LastFound
 	Gui, Settings: New
-	Gui, Font, s11 Ariel
-	Gui, Settings: Add, Text, x10, Enter the paths to the *.exe and *.ico files of your desired video players `n (You can also use the same *.exe path for icon instead of *.ico) `n
 	
+	Gui, Font, s11 Ariel
+	Gui, Settings: Add, Tab3,, Player Configuration|GUI Settings|About
+	
+	Gui, Tab, 1
+	Gui, Settings: Add, Text, y+10, Enter the paths to the *.exe and *.ico files of your desired video players `n (You can also use the same *.exe path for icon instead of *.ico) `n
+
+	; Gui, Settings: Add, GroupBox, y+10 w200 h100 section, Player 1
 	Gui, Settings: Add, Text, x580 y55 section, Hotkey:
-	Gui, Settings: Add, HotKey, x580 y+1 w75 h20 vREG_Player1_Hotkey, 1
+	Gui, Settings: Add, HotKey, x580 y+1 w75 h20 vREG_Player1_Hotkey, %Player1_Hotkey%
 	Gui, Settings: Add, Text, x25 y55, Path to Player 1's .exe-
 	Gui, Settings: Add, Edit, vREG_Player1_Path x+5 w370 h20, %Player1_Path%
 	Gui, Settings: Add, Text, x25 y+1, Path to Player 1's Icon-
 	Gui, Settings: Add, Edit, vREG_Player1_Icon x+5 w370 h20, %Player1_Icon%
 	
 	Gui, Settings: Add, Text, x580 y120, Hotkey:
-	Gui, Settings: Add, HotKey, x580 y+1 w75 h20 vREG_Player2_Hotkey, 2
+	Gui, Settings: Add, HotKey, x580 y+1 w75 h20 vREG_Player2_Hotkey, %Player2_Hotkey%
 	Gui, Settings: Add, Text, x25 y120, Path to Player 2's .exe-
 	Gui, Settings: Add, Edit, vREG_Player2_Path x+5 w370 h20, %Player2_Path%
 	Gui, Settings: Add, Text, x25 y+1, Path to Player 2's Icon-
 	Gui, Settings: Add, Edit, vREG_Player2_Icon x+5 w370 h20, %Player2_Icon%
 	
 	Gui, Settings: Add, Text, x580 y185, Hotkey:
-	Gui, Settings: Add, HotKey, x580 y+1 w75 h20 vREG_Player3_Hotkey, 3
+	Gui, Settings: Add, HotKey, x580 y+1 w75 h20 vREG_Player3_Hotkey, %Player3_Hotkey%
 	Gui, Settings: Add, Text, x25 y185, Path to Player 3's .exe-
 	Gui, Settings: Add, Edit, vREG_Player3_Path x+5 w370 h20, %Player3_Path%
 	Gui, Settings: Add, Text, x25 y+1, Path to Player 3's Icon-
 	Gui, Settings: Add, Edit, vREG_Player3Icon x+5 w370 h20, %Player3_Icon%
 	
 	Gui, Settings: Add, Text, x580 y250, Hotkey:
-	Gui, Settings: Add, HotKey, x580 y+1 w75 h20 vREG_Player4_Hotkey, 4
+	Gui, Settings: Add, HotKey, x580 y+1 w75 h20 vREG_Player4_Hotkey, %Player4_Hotkey%
 	Gui, Settings: Add, Text, x25 y250, Path to Player 4's .exe-
 	Gui, Settings: Add, Edit, vREG_Player4_Path x+5 w370 h20, %Player4_Path%
 	Gui, Settings: Add, Text, x25 y+1, Path to Player 4's Icon-
 	Gui, Settings: Add, Edit, vREG_Player4_Icon x+5 w370 h20, %Player4_Icon%
 	
 	Gui, Settings: Add, Text, x580 y315, Hotkey:
-	Gui, Settings: Add, HotKey, x580 y+1 w75 h20 vREG_Player5_Hotkey, 5
+	Gui, Settings: Add, HotKey, x580 y+1 w75 h20 vREG_Player5_Hotkey, %Player5_Hotkey%
 	Gui, Settings: Add, Text, x25 y315, Path to Player 5's .exe-
 	Gui, Settings: Add, Edit, vREG_Player5_Path x+5 w370 h20, %Player5_Path%
 	Gui, Settings: Add, Text, x25 y+1, Path to Player 5's Icon-
 	Gui, Settings: Add, Edit, vREG_Player5_Icon x+5 w370 h20, %Player5_Icon%
 	
-	Gui, Settings: Add, Text, x25 y380, Background Color:
-	Gui, Settings: Add, ComboBox, x+15 y380 w120 vREG_ColorChoice Simple, Black|White|Transparent|00FFFF|808080
-	Gui, Settings: Add, Text, x+10 y380, (You can also add your own 'Hex' Code for any Color)
-	
+	Gui, Tab, 2
+	Gui, Settings: Add, Text, x25 y+m, Background Color:
+	Gui, Settings: Add, ComboBox, x+15 y+0 w120 vREG_ColorChoice Simple, Black|White|Transparent|00FFFF|808080
+	Gui, Settings: Add, Text, x+10 y+m, (You can also add your own 'Hex' Code for any Color)
+
+	Gui, Tab
 	Gui, Settings: Add, Button, Default x520 y460 w80, &Cancel
 	Gui, Settings: Add, Button, Default x620 y460 w80, &Submit
 
@@ -200,7 +208,7 @@ Return
 SettingsButtonSubmit:
 	; MsgBox, You Pressed Submit
 	Gui, Settings: Submit
-	MsgBox, "%REG_Player1_Hotkey%"`n"%REG_Player1_Path%"`n"%REG_Player1_Icon%"`n`n"%REG_Player2_Hotkey%"`n"%REG_Player2_Path%"`n"%REG_Player2_Icon%"`n`n"%REG_Player3_Hotkey%"`n"%REG_Player3_Path%"`n"%REG_Player3_Icon%"`n`n"%REG_Player4_Hotkey%"`n"%REG_Player4_Path%"`n"%REG_Player4_Icon%"`n`n"%REG_Player5_Hotkey%"`n"%REG_Player5_Path%"`n"%REG_Player5_Icon%"`n`n"%ColorChoice%"
+	; MsgBox, "%REG_Player1_Hotkey%"`n"%REG_Player1_Path%"`n"%REG_Player1_Icon%"`n`n"%REG_Player2_Hotkey%"`n"%REG_Player2_Path%"`n"%REG_Player2_Icon%"`n`n"%REG_Player3_Hotkey%"`n"%REG_Player3_Path%"`n"%REG_Player3_Icon%"`n`n"%REG_Player4_Hotkey%"`n"%REG_Player4_Path%"`n"%REG_Player4_Icon%"`n`n"%REG_Player5_Hotkey%"`n"%REG_Player5_Path%"`n"%REG_Player5_Icon%"`n`n"%ColorChoice%"
 	Ini_Write()	
 	Gui, Settings: Destroy
 	Goto, MainWindow
@@ -260,27 +268,27 @@ Ini_Read() {
 }
 
 Ini_Write() {
-	IniDelete, config.ini, Player_1
+	; IniDelete, config.ini, Player_1
 	IniWrite, %REG_Player1_Hotkey%, config.ini, Player_1, Player1_Hotkey
 	IniWrite, %REG_Player1_Path%, config.ini, Player_1, Player1_Path
 	IniWrite, %REG_Player1_Icon%, config.ini, Player_1, Player1_Icon
 
-	IniDelete, config.ini, Player_2
+	; IniDelete, config.ini, Player_2
 	IniWrite, %REG_Player2_Hotkey%, config.ini, Player_2, Player2_Hotkey
 	IniWrite, %REG_Player2_Path%, config.ini, Player_2, Player2_Path
 	IniWrite, %REG_Player2_Icon%, config.ini, Player_2, Player2_Icon
 
-	IniDelete, config.ini, Player_3
+	; IniDelete, config.ini, Player_3
 	IniWrite, %REG_Player3_Hotkey%, config.ini, Player_3, Player3_Hotkey
 	IniWrite, %REG_Player3_Path%, config.ini, Player_3, Player3_Path
 	IniWrite, %REG_Player3_Icon%, config.ini, Player_3, Player3_Icon
 
-	IniDelete, config.ini, Player_4
+	; IniDelete, config.ini, Player_4
 	IniWrite, %REG_Player4_Hotkey%, config.ini, Player_4, Player4_Hotkey
 	IniWrite, %REG_Player4_Path%, config.ini, Player_4, Player4_Path
 	IniWrite, %REG_Player4_Icon%, config.ini, Player_4, Player4_Icon
 
-	IniDelete, config.ini, Player_5
+	; IniDelete, config.ini, Player_5
 	IniWrite, %REG_Player5_Hotkey%, config.ini, Player_5, Player5_Hotkey
 	IniWrite, %REG_Player5_Path%, config.ini, Player_5, Player5_Path
 	IniWrite, %REG_Player5_Icon%, config.ini, Player_5, Player5_Icon
