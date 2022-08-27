@@ -2,8 +2,8 @@
 ;@Ahk2Exe-ExeName	Player Picker
 ;@Ahk2Exe-SetProductName	Player Picker
 ;@Ahk2Exe-SetDescription	Player Picker
-;@Ahk2Exe-SetVersion		0.5.0-alpha
-CurrentVersion := 			"0.5.0-alpha"
+;@Ahk2Exe-SetVersion		0.6.2-alpha
+CurrentVersion := 			"0.6.2-alpha"
 ;@Ahk2Exe-SetOrigFilename	Player-Picker.ahk
 ;@Ahk2Exe-SetCompanyName	Jery
 
@@ -24,6 +24,7 @@ SetBatchLines -1
 #SIngleInstance Force
 #Persistent
 /*@Ahk2Exe-Keep
+#Warn All, Off
 #NoTrayIcon
 */
 SetWorkingDir %A_ScriptDir%
@@ -57,7 +58,7 @@ File_Path := Trim(param)
 
 ;--------Hotkeys-------------------------------------------------
 ; #If (WinExist("Pick a Video Player to Play") AND !WinExist("Settings"))
-Hotkey, IfWinNotActive, Settings
+Hotkey, IfWinNotExist, Settings
 Hotkey, %Player1_Hotkey%, Player1
 Hotkey, %Player2_Hotkey%, Player2
 Hotkey, %Player3_Hotkey%, Player3
@@ -93,7 +94,7 @@ Ini_Read()
 		Gui, Add, Picture, x+30 w-1 hp gPlayer5, %Player5_Icon%
 		
 	Gui Add, Picture, x+30 w-1 h30 gSettings, %Settings_Icon%
-	Goto, Settings
+	; Goto, Settings
 	Gui, Show, AutoSize, Pick a Video Player to Play "%File_Path%"
 Return
 
@@ -106,7 +107,7 @@ Menu, tray, icon, %Settings_Icon%
 	Gui, Settings: New
 	
 	Gui, Font, s11, Arial
-	Gui, Settings: Add, Tab3,, Player Configuration|GUI Settings||About
+	Gui, Settings: Add, Tab3,, Player Configuration|GUI Settings|About
 	
 	Gui, Tab, 1
 		Gui, Settings: Add, Text, y+10, Enter the paths to the *.exe and *.ico files of your desired video players `n (You can also use the same *.exe path for icon.) `n
@@ -201,6 +202,15 @@ Menu, tray, icon, %Settings_Icon%
 Menu, tray, icon, %Main_Icon%
 Return
 
+#If
+Esc::
+GuiClose:
+GuiEscape:
+	FileDelete, %Main_Icon%
+	FileDelete, %Settings_Icon%
+	ExitApp
+Return
+
 ;SubRoutines for GUI 1 (MainWindow)
 Player1:
 	Player("1")
@@ -255,27 +265,106 @@ SettingsButtonSubmit:
 	Goto, MainWindow
 	Reload
 Return
+
 SetUpAssociations:
 	Gui, Settings: +Disabled
 	Gui, FTA: New
+	Gui, Font, s11, Arial
 	Gui, FTA: +OwnerSettings
-	Gui, FTA: Add, Text, , Pick the extensions you would like to associate with Player Picker
-	Gui, FTA: Add, 
-	; Gui, FTA: Add, 
+	Gui, FTA: Add, Text, x10 y15 w300 wrap, Pick the extensions you would like to associate with Player Picker
+	Gui, FTA: Add, GroupBox, x10 yp+45 w150 h280 Section, Video
+		Gui, FTA: Add, Button, xs+30 ys+30 w100 gCheckBox1V, .mp4
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox2V, .mkv
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox3V, .wmv
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox4V, .flv
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox5V, .avi
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox6V, .mov
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox7V, .webm
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox8V, .avchd
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox9V, .mts
+	Gui, FTA: Add, GroupBox, x180 ys w150 h280 Section, Audio
+		Gui, FTA: Add, Button, xs+30 ys+30 w100 gCheckBox1A, .mp3
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox2A, .m4a
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox3A, .flac
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox4A, .wav
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox5A, .wma
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox6A, .aac
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox7A, .ogg
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox8A, .pcm
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox9A, .alac
+	
+	If A_OSVersion > 10.0.22
+	{
+		Gui, FTA: Add, Text, x10 yp+60 w320 wrap, Looks like you are on Windows 11... You need to set 'Player Picker' as default manually by heading to "Default Apps" and choosing 'Player Picker' as Default.
+		Gui, FTA: Add, Link, xp y+2, <a href="control /name Microsoft.DefaultPrograms /page pageDefaultProgram">Proceed to "Default Apps"</a>
+	}
+	
+	Gui, FTA: Add, Button, x140 y+35 gFTAButtonClose, &Close
+
 	Gui, FTA: Show
-
-	; FileAssociate(".mp4")
 Return
 
-
-#If
-Esc::
-GuiClose:
-GuiEscape:
-	FileDelete, %Main_Icon%
-	FileDelete, %Settings_Icon%
-	ExitApp
+CheckBox1V:
+	FileAssociate(".mp4")
 Return
+CheckBox2V:
+	FileAssociate(".mkv")
+Return
+CheckBox3V:
+	FileAssociate(".wmv")
+Return
+CheckBox4V:
+	FileAssociate(".flv")
+Return
+CheckBox5V:
+	FileAssociate(".avi")
+Return
+CheckBox6V:
+	FileAssociate(".mov")
+Return
+CheckBox7V:
+	FileAssociate(".webm")
+Return
+CheckBox8V:
+	FileAssociate(".avchd")
+Return
+CheckBox9V:
+	FileAssociate(".mts")
+Return
+
+CheckBox1A:
+	FileAssociate(".mp3")
+Return
+CheckBox2A:
+	FileAssociate(".m4a")
+Return
+CheckBox3A:
+	FileAssociate(".flac")
+Return
+CheckBox4A:
+	FileAssociate(".wav")
+Return
+CheckBox5A:
+	FileAssociate(".wma")
+Return
+CheckBox6A:
+	FileAssociate(".aac")
+Return
+CheckBox7A:
+	FileAssociate(".ogg")
+Return
+CheckBox8A:
+	FileAssociate(".pcm")
+Return
+CheckBox9A:
+	FileAssociate(".alac")
+Return
+
+FTAButtonClose:
+	Gui, Settings: -Disabled
+	Gui, FTA: Destroy
+Return
+
 
 
 
