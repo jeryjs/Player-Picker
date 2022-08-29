@@ -2,8 +2,8 @@
 ;@Ahk2Exe-ExeName	Player Picker
 ;@Ahk2Exe-SetProductName	Player Picker
 ;@Ahk2Exe-SetDescription	Player Picker
-;@Ahk2Exe-SetVersion		0.6.3-alpha
-CurrentVersion := 			"0.6.3-alpha"
+;@Ahk2Exe-SetVersion		v0.6.4-alpha
+CurrentVersion := 			"v0.6.4-alpha"
 ;@Ahk2Exe-SetOrigFilename	Player-Picker.ahk
 ;@Ahk2Exe-SetCompanyName	Jery
 
@@ -23,14 +23,17 @@ SetBatchLines -1
 #UseHook
 #SIngleInstance Force
 #Persistent
+SetWorkingDir %A_ScriptDir%
 /*@Ahk2Exe-Keep
 #Warn All, Off
 #NoTrayIcon
 */
-SetWorkingDir %A_ScriptDir%
 
-Settings_Icon := % A_Temp "\PlayerPicker_Settings-Icon.ico"
-Main_Icon := % A_Temp "\PlayerPicker_Main.ico"
+Global Temp := % A_Temp "\PlayerPicker"
+FileCreateDir, %Temp%
+
+Settings_Icon := % Temp "\PlayerPicker_Settings-Icon.ico"
+Main_Icon := % Temp "\PlayerPicker_Main.ico"
 
 FileInstall, Assets\PlayerPicker_Main.ico, %Main_Icon%
 FileInstall, Assets\PlayerPicker_Settings-Icon.ico, %Settings_Icon%
@@ -59,7 +62,7 @@ File_Path := Trim(param)
 
 ;--------Hotkeys-------------------------------------------------
 ; #If (WinExist("Pick a Video Player to Play") AND !WinExist("Settings"))
-Hotkey, IfWinNotActive, Settings
+Hotkey, IfWinNotExist, Settings
 Hotkey, %Player1_Hotkey%, Player1
 Hotkey, %Player2_Hotkey%, Player2
 Hotkey, %Player3_Hotkey%, Player3
@@ -73,8 +76,9 @@ Hotkey, %Settings_Hotkey%, Settings
 MainWindow:
 Ini_Read()
 ; MsgBox, "%Player1_Hotkey%"`n"%Player1_Path%"`n"%Player1_Icon%"`n`n"%Player2_Hotkey%"`n"%Player2_Path%"`n"%Player2_Icon%"`n`n"%Player3_Hotkey%"`n"%Player3_Path%"`n"%Player3_Icon%"`n`n"%Player4_Hotkey%"`n"%Player4_Path%"`n"%Player4_Icon%"`n`n"%Player5_Hotkey%"`n"%Player5_Path%"`n"%Player5_Icon%"`n`n"%ColorChoice%"
-	Gui, +Owner%scHwnd%
-	Gui +HWNDMainWindow +LastFound +AlwaysOnTop +ToolWindow
+	Gui, Main: New
+	Gui, Main: Default
+	Gui, +Owner%scHwnd% +HWNDMainWindow +LastFound +AlwaysOnTop +ToolWindow
 	
 	If (ColorChoice = "ERROR")
 		ColorChoice := "Black"
@@ -102,7 +106,7 @@ Return
 ;--------Settings (Gui 2)-------------------------------------------------
 Settings:
 Menu, tray, icon, %Settings_Icon%
-	Gui, 1: Destroy
+	Gui, Main: Destroy
 	; Gui, Margin, 10, 10
 	Gui, Settings: +HWNDSettingsWindow +AlwaysOnTop +LastFound
 	Gui, Settings: New
@@ -183,11 +187,11 @@ Menu, tray, icon, %Settings_Icon%
 		Gui, Font, s26 w700, Comic Sans MS
 		Gui, Settings: Add, Text, x+35 ys+55 center, Player Picker
 		Gui, Font, s22 w600, Courier
-		Gui, Settings: Add, Text, xp+5 yp+55 center, v%CurrentVersion%
+		Gui, Settings: Add, Text, xp+5 yp+55 center, %CurrentVersion%
 		Gui, Font, s20 w200, Comic Sans MS
 		Gui, Settings: Add, Text, y+20,~By Jery
 		Gui, Font, s13 w600, Courier
-		Gui, Settings: Add, Button, xs y+70, Check for Updates (coming soon)
+		Gui, Settings: Add, Button, xs y+70 gCheckForUpdates, Check for Updates
 
 
 	Gui, Tab
@@ -202,12 +206,52 @@ Menu, tray, icon, %Settings_Icon%
 Menu, tray, icon, %Main_Icon%
 Return
 
+;--------FTA (Gui 3)-------------------------------------------------
+SetUpAssociations:
+	Gui, Settings: +Disabled
+	Gui, FTA: New
+	Gui, Font, s11, Arial
+	Gui, FTA: +OwnerSettings
+	Gui, FTA: Add, Text, x10 y15 w300 wrap, Pick the extensions you would like to associate with Player Picker
+	Gui, FTA: Add, GroupBox, x10 yp+45 w150 h280 Section, Video
+		Gui, FTA: Add, Button, xs+30 ys+30 w100 gCheckBox1V, .mp4
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox2V, .mkv
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox3V, .wmv
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox4V, .flv
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox5V, .avi
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox6V, .mov
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox7V, .webm
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox8V, .avchd
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox9V, .mts
+	Gui, FTA: Add, GroupBox, x180 ys w150 h280 Section, Audio
+		Gui, FTA: Add, Button, xs+30 ys+30 w100 gCheckBox1A, .mp3
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox2A, .m4a
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox3A, .flac
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox4A, .wav
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox5A, .wma
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox6A, .aac
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox7A, .ogg
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox8A, .pcm
+		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox9A, .alac
+	
+	If A_OSVersion > 10.0.22	; Display Instructions depending on OS version
+	{
+		Gui, FTA: Add, Text, x10 yp+60 w320 wrap, Looks like you are on Windows 11... You need to set 'Player Picker' as default manually by heading to "Default Apps" and choosing 'Player Picker' as Default.
+		Gui, FTA: Add, Link, xp y+2, <a href="control /name Microsoft.DefaultPrograms /page pageDefaultProgram">Proceed to "Default Apps"</a>
+	}Else
+		Gui, FTA: Add, Text, x10 yp+60 w320 wrap, If u ever get the "Open With" Dialogue when opening a file then select "Player Picker" and 'Set it as Default'
+	
+	Gui, FTA: Add, Button, x140 y+35 gFTAButtonClose, &Close
+
+	Gui, FTA: Show
+Return
+
+;-----------------------------------------------------------------
 #If
 Esc::
 GuiClose:
 GuiEscape:
-	FileDelete, %Main_Icon%
-	FileDelete, %Settings_Icon%
+	Goto, ExitApp
 	ExitApp
 Return
 
@@ -266,45 +310,27 @@ SettingsButtonSubmit:
 	Reload
 Return
 
-SetUpAssociations:
-	Gui, Settings: +Disabled
-	Gui, FTA: New
-	Gui, Font, s11, Arial
-	Gui, FTA: +OwnerSettings
-	Gui, FTA: Add, Text, x10 y15 w300 wrap, Pick the extensions you would like to associate with Player Picker
-	Gui, FTA: Add, GroupBox, x10 yp+45 w150 h280 Section, Video
-		Gui, FTA: Add, Button, xs+30 ys+30 w100 gCheckBox1V, .mp4
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox2V, .mkv
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox3V, .wmv
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox4V, .flv
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox5V, .avi
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox6V, .mov
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox7V, .webm
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox8V, .avchd
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox9V, .mts
-	Gui, FTA: Add, GroupBox, x180 ys w150 h280 Section, Audio
-		Gui, FTA: Add, Button, xs+30 ys+30 w100 gCheckBox1A, .mp3
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox2A, .m4a
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox3A, .flac
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox4A, .wav
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox5A, .wma
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox6A, .aac
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox7A, .ogg
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox8A, .pcm
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox9A, .alac
-	
-	If A_OSVersion > 10.0.22
-	{
-		Gui, FTA: Add, Text, x10 yp+60 w320 wrap, Looks like you are on Windows 11... You need to set 'Player Picker' as default manually by heading to "Default Apps" and choosing 'Player Picker' as Default.
-		Gui, FTA: Add, Link, xp y+2, <a href="control /name Microsoft.DefaultPrograms /page pageDefaultProgram">Proceed to "Default Apps"</a>
-	}Else
-		Gui, FTA: Add, Text, x10 yp+60 w320 wrap, If u ever get the "Open With" Dialogue when opening a file then select "Player Picker" and 'Set it as Default'
-	
-	Gui, FTA: Add, Button, x140 y+35 gFTAButtonClose, &Close
-
-	Gui, FTA: Show
+CheckForUpdates:
+; MsgBox, %A_Temp%\PlayerPicker_Source.html
+	; UrlDownloadToFile, https://github.com/jeryjs/Player-Picker/releases, %A_Temp%\PlayerPicker_Source.html
+	DownloadFile("https://github.com/jeryjs/Player-Picker/releases", Temp "\PlayerPicker_Source.html", "False")
+		FileReadLine, Version, %Temp%\PlayerPicker_Source.html, 966
+		Gui +OwnDialogs
+		NewVersion := RegExReplace(Version, " ", "")
+		; MsgBox, %Version%`n%NewVersion%`n%CurrentVersion%
+		If !(NewVersion > CurrentVersion)
+			MsgBox, 64, Update not Found!, You are on the latest versiont: %CurrentVersion%
+		Else
+			MsgBox, 49, Update Found!, Your Current Version is: %CurrentVersion%`nUpdate to the latest version %NewVersion%?
+			IfMsgBox Ok
+			{
+				Gui +OwnDialogs
+				DownloadFile("https://github.com/jeryjs/Player-Picker/releases/download/" NewVersion "/Player.Picker.exe", Temp "\PlayerPicker_Update.exe")
+			}
+			
 Return
 
+;SubRoutines for GUI 3 (FTA)
 CheckBox1V:
 	FileAssociate(".mp4")
 Return
@@ -365,9 +391,6 @@ FTAButtonClose:
 	Gui, Settings: -Disabled
 	Gui, FTA: Destroy
 Return
-
-
-
 
 
 ;--------Ini Settings-------------------------------------------------
@@ -437,13 +460,13 @@ Return
 
 
 
-
+;--------------File Associate--------------------------------------------------
 FileAssociate(Ext, Label:="PlayerPicker", Cmd:="", Icon:="", batchMode:=0) {
 Cmd := A_ScriptFullPath
 Icon := A_ScriptFullPath
 ; by Ħakito: https://autohotkey.com/boards/viewtopic.php?f=6&t=55638 
 ; modified by Marius Șucan to AHK v1.1
-mainCompiledPath := A_Temp "\PlayerPicker"
+Global mainCompiledPath := Temp
 FileCreateDir, %mainCompiledPath%
 
   ; Weeds out faulty extensions, which must start with a period, and contain more than 1 character
@@ -502,8 +525,76 @@ FileCreateDir, %mainCompiledPath%
 		 RunWait, *RunAs %mainCompiledPath%\regFiles\runThis.bat
 		 FileDelete, %mainCompiledPath%\regFiles\RegFormat%iExt%.reg
 		 FileDelete, %mainCompiledPath%\regFiles\runThis.bat
+		 FileRemoveDir, %mainCompiledPath%, 1
 	 */
   }
 
   return 1
 }
+
+;--------------Download File--------------------------------------------------
+DownloadFile(UrlToFile, SaveFileAs, Download := True, Overwrite := True, UseProgressBar := True) {
+		If (Download="True")
+			DownloaderTitle := PlayerPicker %NewVersion%
+		Else
+			DownloaderTitle := PlayerPicker %CurrentVersion%
+		If (!Overwrite && FileExist(SaveFileAs))
+		  Return
+		If (UseProgressBar) {
+			WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+			WebRequest.Open("HEAD", UrlToFile)
+			WebRequest.Send()
+			If (Download="True")
+			{
+				FinalSize := WebRequest.GetResponseHeader("Content-Length")
+				Progress, H80, , Downloading..., %DownloaderTitle%
+			} Else {
+				FinalSize := 145000
+				Progress, H80, , Checking for Update..., %DownloaderTitle%
+			}
+			SetTimer, __UpdateProgressBar, 100
+		}
+		UrlDownloadToFile, %UrlToFile%, %SaveFileAs%
+		If ErrorLevel = 1
+			MsgBox, 16, Player Picker, There was an error downloading the update. Please check your network connection and try again or download the update manually from: https://github.com/jeryjs/Player-Picker/releases
+		Else {
+			If (UseProgressBar) {
+			  Progress, Off
+			  SetTimer, __UpdateProgressBar, Off
+			}
+		}
+    Return
+	
+    __UpdateProgressBar:
+		CurrentSize := FileOpen(SaveFileAs, "r").Length
+		CurrentSizeTick := A_TickCount
+		Speed := Round((CurrentSize/1024-LastSize/1024)/((CurrentSizeTick-LastSizeTick)/1000)) . " Kb/s"
+		LastSizeTick := CurrentSizeTick
+		LastSize := FileOpen(SaveFileAs, "r").Length
+		PercentDone := Round(CurrentSize/FinalSize*100)
+		If (Download="True")
+			Progress, %PercentDone%, %PercentDone%`% Done, Downloading...  (%Speed%), Downloading %DownloaderTitle% (%PercentDone%`%)
+		Else
+			Progress, %PercentDone%, %PercentDone%`% Done, Checking for Update...  (%Speed%), Checking for Update %DownloaderTitle% (%PercentDone%`%)
+    Return
+}
+
+
+
+
+
+
+
+
+
+
+
+ExitApp:
+
+	FileDelete, %Main_Icon%
+	FileDelete, %Settings_Icon%
+	FileDelete, %Temp%\PlayerPicker_Source.html
+	FileDelete, %Temp%\PlayerPicker_Update.exe
+	FileRemoveDir, %Temp%, 1
+	
+ExitApp
