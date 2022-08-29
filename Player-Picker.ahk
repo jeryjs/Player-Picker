@@ -46,6 +46,7 @@ Global REG_Player1_Path, Global REG_Player2_Path, Global REG_Player3_Path, Globa
 Global REG_Player1_Icon, Global REG_Player2_Icon, Global REG_Player3_Icon, Global REG_Player4_Icon, Global REG_Player5_Icon
 
 Global ColorChoice, Global REG_ColorChoice, Global Settings_Hotkey, Global REG_Settings_Hotkey, Global Icon_Size, Global REG_Icon_Size
+Global File_Path
 
 Ini_Read()
 
@@ -58,7 +59,7 @@ File_Path := Trim(param)
 
 ;--------Hotkeys-------------------------------------------------
 ; #If (WinExist("Pick a Video Player to Play") AND !WinExist("Settings"))
-Hotkey, IfWinNotExist, Settings
+Hotkey, IfWinNotActive, Settings
 Hotkey, %Player1_Hotkey%, Player1
 Hotkey, %Player2_Hotkey%, Player2
 Hotkey, %Player3_Hotkey%, Player3
@@ -172,7 +173,6 @@ Menu, tray, icon, %Settings_Icon%
 		Gui, Settings: Add, Text, xs+5 yp+60, Set Player Icons Size:
 		Gui, Settings: Add, Edit, x+10 yp-2 w120 vREG_Icon_Size, %Icon_Size%
 		Gui, Settings: Add, UpDown, Range10-300, %Icon_Size%
-		; Gui, Settings: Add,
 		
 		Gui, Settings: Add, Text, xs+1 y+150 0x2, Many more options coming soon... Maybe?
 		
