@@ -8,7 +8,7 @@ CurrentVersion := 			"0.6.2-alpha"
 ;@Ahk2Exe-SetCompanyName	Jery
 
 ;@Ahk2Exe-SetMainIcon Assets\PlayerPicker_Main.ico
-MsgBox, Hello
+
 #NoEnv
 SetTitleMatchMode 2
 SetTitleMatchMode Fast
