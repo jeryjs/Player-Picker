@@ -2,8 +2,8 @@
 ;@Ahk2Exe-ExeName	Player Picker
 ;@Ahk2Exe-SetProductName	Player Picker
 ;@Ahk2Exe-SetDescription	Player Picker
-;@Ahk2Exe-SetVersion		0.6.2-alpha
-CurrentVersion := 			"0.6.2-alpha"
+;@Ahk2Exe-SetVersion		0.6.3-alpha
+CurrentVersion := 			"0.6.3-alpha"
 ;@Ahk2Exe-SetOrigFilename	Player-Picker.ahk
 ;@Ahk2Exe-SetCompanyName	Jery
 
@@ -111,7 +111,7 @@ Menu, tray, icon, %Settings_Icon%
 	Gui, Settings: Add, Tab3,, Player Configuration|GUI Settings|About
 	
 	Gui, Tab, 1
-		Gui, Settings: Add, Text, y+10, Enter the paths to the *.exe and *.ico files of your desired video players `n (You can also use the same *.exe path for icon.) `n
+		Gui, Settings: Add, Text, y+10, Enter the paths to the *.exe and icon files of your desired video players `n (You can also use the same *.exe path for icon.) `n
 		
 		Gui, Add, GroupBox, x25 yp+35 w640 h70 vGroupBox1
 		Gui, Add, GroupBox, y+0 w640 h70 vGroupBox2
@@ -164,7 +164,7 @@ Menu, tray, icon, %Settings_Icon%
 		Gui, Settings: Add, GroupBox, x25 y+5 w630 h300 Section
 		Gui, Settings: Add, Text,xs+5 ys+15, Background Color:
 		Gui, Settings: Add, ComboBox, x+10 yp r4 w120 vREG_ColorChoice Simple, %ColorChoice%||Black|White|Transparent|00FFFF|808080
-		Gui, Settings: Add, Text, xp+150 yp wrap w400, (You can also add your own 𝙃𝙚𝙭 𝘾𝙤𝙙𝙚 for any Color)
+		Gui, Settings: Add, Text, xp+150 yp wrap w400, (You can also add your own Hex Code for any Color)
 		Gui, Settings: Add, Link,, <a href="https://colorpicker.me/#000000">Go to Online Color Picker</a>
 		
 		Gui, Settings: Add, Text, xs+5 yp+100, Hotkey to open Settings: 
@@ -297,7 +297,8 @@ SetUpAssociations:
 	{
 		Gui, FTA: Add, Text, x10 yp+60 w320 wrap, Looks like you are on Windows 11... You need to set 'Player Picker' as default manually by heading to "Default Apps" and choosing 'Player Picker' as Default.
 		Gui, FTA: Add, Link, xp y+2, <a href="control /name Microsoft.DefaultPrograms /page pageDefaultProgram">Proceed to "Default Apps"</a>
-	}
+	}Else
+		Gui, FTA: Add, Text, x10 yp+60 w320 wrap, If u ever get the "Open With" Dialogue when opening a file then select "Player Picker" and 'Set it as Default'
 	
 	Gui, FTA: Add, Button, x140 y+35 gFTAButtonClose, &Close
 
