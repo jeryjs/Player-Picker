@@ -2,8 +2,8 @@
 ;@Ahk2Exe-ExeName	Player Picker
 ;@Ahk2Exe-SetProductName	Player Picker
 ;@Ahk2Exe-SetDescription	Player Picker
-;@Ahk2Exe-SetVersion		v0.6.4-alpha
-CurrentVersion := 			"v0.6.4-alpha"
+;@Ahk2Exe-SetVersion		v0.6.5-alpha
+CurrentVersion := 		   "v0.6.5-alpha"
 ;@Ahk2Exe-SetOrigFilename	Player-Picker.ahk
 ;@Ahk2Exe-SetCompanyName	Jery
 
@@ -312,9 +312,9 @@ Return
 
 CheckForUpdates:
 ; MsgBox, %A_Temp%\PlayerPicker_Source.html
-	; UrlDownloadToFile, https://github.com/jeryjs/Player-Picker/releases, %A_Temp%\PlayerPicker_Source.html
-	DownloadFile("https://github.com/jeryjs/Player-Picker/releases", Temp "\PlayerPicker_Source.html", "False")
-		FileReadLine, Version, %Temp%\PlayerPicker_Source.html, 966
+	; UrlDownloadToFile, https://github.com/jeryjs/Player-Picker/releases, %A_Temp%\Source.html
+	DownloadFile("https://github.com/jeryjs/Player-Picker/releases", Temp "\Source.html",,, True)
+		FileReadLine, Version, %Temp%\Source.html, 966
 		Gui +OwnDialogs
 		NewVersion := RegExReplace(Version, " ", "")
 		; MsgBox, %Version%`n%NewVersion%`n%CurrentVersion%
@@ -325,7 +325,10 @@ CheckForUpdates:
 			IfMsgBox Ok
 			{
 				Gui +OwnDialogs
-				DownloadFile("https://github.com/jeryjs/Player-Picker/releases/download/" NewVersion "/Player.Picker.exe", Temp "\PlayerPicker_Update.exe")
+				DownloadFile("https://github.com/jeryjs/Player-Picker/releases/download/" NewVersion "/Player.Picker.exe", Temp "\Update.exe")
+				/*@Ahk2Exe-Keep
+					FileCopy, %Temp%\Update.exe, %A_ScriptFullPath%
+				*/
 			}
 			
 Return
@@ -466,8 +469,7 @@ Cmd := A_ScriptFullPath
 Icon := A_ScriptFullPath
 ; by Ħakito: https://autohotkey.com/boards/viewtopic.php?f=6&t=55638 
 ; modified by Marius Șucan to AHK v1.1
-Global mainCompiledPath := Temp
-FileCreateDir, %mainCompiledPath%
+FileCreateDir, %Temp%
 
   ; Weeds out faulty extensions, which must start with a period, and contain more than 1 character
   iF (SubStr(Ext,1,1)!="." || StrLen(Ext)<=1)
@@ -504,28 +506,28 @@ FileCreateDir, %mainCompiledPath%
   If Icon
      regFile .= "`n[HKEY_CLASSES_ROOT\" QPVslideshow "\DefaultIcon]`n@=" Icon "`n`n"
 
-  If !InStr(FileExist(mainCompiledPath "\regFiles"), "D")
+  If !InStr(FileExist(Temp "\regFiles"), "D")
   {
-     FileCreateDir, %mainCompiledPath%\regFiles
+     FileCreateDir, %Temp%\regFiles
      Sleep, 1
   }
 
   iExt := StrReplace(Ext, ".")
-  FileDelete, %mainCompiledPath%\regFiles\RegFormat%iExt%.reg
+  FileDelete, %Temp%\regFiles\RegFormat%iExt%.reg
   Sleep, 1
-  FileAppend, % regFile, %mainCompiledPath%\regFiles\RegFormat%iExt%.reg
-  runTarget := "Reg Import """ mainCompiledPath "\regFiles\RegFormat" iExt ".reg" """" "`n"
+  FileAppend, % regFile, %Temp%\regFiles\RegFormat%iExt%.reg
+  runTarget := "Reg Import """ Temp "\regFiles\RegFormat" iExt ".reg" """" "`n"
   If !InStr("|WIN_7|WIN_8|WIN_8.1|WIN_VISTA|WIN_2003|WIN_XP|WIN_2000|", "|" A_OSVersion "|")
-     runTarget .= """" mainCompiledPath "\SetUserFTA.exe""" A_Space Ext A_Space Label "`n"
-  FileAppend, % runTarget, %mainCompiledPath%\regFiles\runThis.bat
+     runTarget .= """" Temp "\SetUserFTA.exe""" A_Space Ext A_Space Label "`n"
+  FileAppend, % runTarget, %Temp%\regFiles\runThis.bat
   If (batchMode!=1)
   {
      Sleep, 1
 	 /*@Ahk2Exe-Keep
-		 RunWait, *RunAs %mainCompiledPath%\regFiles\runThis.bat
-		 FileDelete, %mainCompiledPath%\regFiles\RegFormat%iExt%.reg
-		 FileDelete, %mainCompiledPath%\regFiles\runThis.bat
-		 FileRemoveDir, %mainCompiledPath%, 1
+		 RunWait, *RunAs %Temp%\regFiles\runThis.bat
+		 FileDelete, %Temp%\regFiles\RegFormat%iExt%.reg
+		 FileDelete, %Temp%\regFiles\runThis.bat
+		 FileRemoveDir, %Temp%, 1
 	 */
   }
 
@@ -533,24 +535,21 @@ FileCreateDir, %mainCompiledPath%
 }
 
 ;--------------Download File--------------------------------------------------
-DownloadFile(UrlToFile, SaveFileAs, Download := True, Overwrite := True, UseProgressBar := True) {
-		If (Download="True")
-			DownloaderTitle := PlayerPicker %NewVersion%
-		Else
-			DownloaderTitle := PlayerPicker %CurrentVersion%
+DownloadFile(UrlToFile, SaveFileAs, Overwrite := True, UseProgressBar := True, Update := False) {
+		Global DownloaderTitle := PlayerPicker %CurrentVersion%
 		If (!Overwrite && FileExist(SaveFileAs))
 		  Return
 		If (UseProgressBar) {
 			WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
 			WebRequest.Open("HEAD", UrlToFile)
 			WebRequest.Send()
-			If (Download="True")
+			If (Update)
 			{
+				FinalSize := 135000
+				Progress, H80, , Checking for Update..., %DownloaderTitle%
+			} Else {
 				FinalSize := WebRequest.GetResponseHeader("Content-Length")
 				Progress, H80, , Downloading..., %DownloaderTitle%
-			} Else {
-				FinalSize := 145000
-				Progress, H80, , Checking for Update..., %DownloaderTitle%
 			}
 			SetTimer, __UpdateProgressBar, 100
 		}
@@ -572,10 +571,10 @@ DownloadFile(UrlToFile, SaveFileAs, Download := True, Overwrite := True, UseProg
 		LastSizeTick := CurrentSizeTick
 		LastSize := FileOpen(SaveFileAs, "r").Length
 		PercentDone := Round(CurrentSize/FinalSize*100)
-		If (Download="True")
-			Progress, %PercentDone%, %PercentDone%`% Done, Downloading...  (%Speed%), Downloading %DownloaderTitle% (%PercentDone%`%)
-		Else
+		If (Update)
 			Progress, %PercentDone%, %PercentDone%`% Done, Checking for Update...  (%Speed%), Checking for Update %DownloaderTitle% (%PercentDone%`%)
+		Else
+			Progress, %PercentDone%, %PercentDone%`% Done, Downloading...  (%Speed%), Downloading %DownloaderTitle% (%PercentDone%`%)
     Return
 }
 
@@ -593,8 +592,8 @@ ExitApp:
 
 	FileDelete, %Main_Icon%
 	FileDelete, %Settings_Icon%
-	FileDelete, %Temp%\PlayerPicker_Source.html
-	FileDelete, %Temp%\PlayerPicker_Update.exe
+	FileDelete, %Temp%\Source.html
+	FileDelete, %Temp%\Update.exe
 	FileRemoveDir, %Temp%, 1
 	
 ExitApp
