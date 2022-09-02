@@ -224,7 +224,6 @@ Esc::
 GuiClose:
 GuiEscape:
 	Goto, ExitApp
-	ExitApp
 Return
 
 ;SubRoutines for GUI 1 (MainWindow)
@@ -262,7 +261,7 @@ Player(n) {
 			Sleep, 2000
 		ControlSend, , {Enter}, mpv.net	;fix potential bug in mpvnet
 		WinActivate, ahk_exe %Match%
-	ExitApp
+	Goto, ExitApp
 	}
 Return
 
