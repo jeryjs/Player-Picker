@@ -105,7 +105,6 @@ Return
 Settings:
 Menu, tray, icon, %Settings_Icon%
 	Gui, Main: Destroy
-	; Gui, Margin, 10, 10
 	Gui, Settings: +HWNDSettingsWindow +AlwaysOnTop +LastFound
 	Gui, Settings: New
 	
@@ -162,7 +161,6 @@ Menu, tray, icon, %Settings_Icon%
 	
 	
 	Gui, Tab, 2
-		; Gui, Settings: Margin, 25, 25
 		Gui, Settings: Add, GroupBox, x25 y+5 w630 h300 Section
 		Gui, Settings: Add, Text,xs+5 ys+15, Background Color:
 		Gui, Settings: Add, ComboBox, x+10 yp r4 w120 vREG_ColorChoice Simple, %ColorChoice%||Black|White|Transparent|00FFFF|808080
@@ -242,7 +240,8 @@ Player5:
 	Player("5")
 Return
 
-Player(n) {
+
+Player(n) {		; Run Player with additional Context
 	Gui, Hide
 	Suspend, On
 	Player_Path := Player%n%_Path
