@@ -391,7 +391,7 @@ DownloadFile(UrlToFile, SaveFileAs, Overwrite := True, UseProgressBar := True, U
 			WebRequest.Send()
 			If (UnknownFileSize)
 			{
-				FinalSize := 135000
+				FinalSize := 135000		; The size of the source.html file, but it can change
 				Progress, H80, , Checking for Update..., %DownloaderTitle%
 			} Else {
 				FinalSize := WebRequest.GetResponseHeader("Content-Length")
