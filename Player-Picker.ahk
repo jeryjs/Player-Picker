@@ -2,8 +2,8 @@
 ;@Ahk2Exe-ExeName	PlayerPicker
 ;@Ahk2Exe-SetProductName	PlayerPicker
 ;@Ahk2Exe-SetDescription	PlayerPicker
-;@Ahk2Exe-SetVersion		v0.6.7-alpha
-CurrentVersion := 		   "v0.6.7-alpha"
+;@Ahk2Exe-SetVersion		v0.7.0-alpha
+CurrentVersion := 		   "v0.7.0-alpha"
 ;@Ahk2Exe-SetCompanyName	Jery
 
 ;@Ahk2Exe-SetMainIcon Assets\PlayerPicker_Main.ico
@@ -196,7 +196,7 @@ Menu, tray, icon, %Settings_Icon%
 	Gui, Tab
 		Gui, Font, s11 w400, Arial
 		Gui, Settings: Add, Button, x520 y460 w80, &Cancel
-		Gui, Settings: Add, Button, Default x620 yp wp, &Submit
+		Gui, Settings: Add, Button, Default x620 yp wp, &Save
 		Gui, Settings: Add, Text, x20 yp, File extension association: 
 		Gui, Settings: Add, Button, x+10 yp+0 w200 h20 gSetUpAssociations, Set up associations...
 		
@@ -272,7 +272,7 @@ SettingsButtonCancel:
 	Gui, Settings: Destroy
 	Goto, MainWindow
 Return
-SettingsButtonSubmit:
+SettingsButtonSave:
 	Gui, Settings: Submit
 	; MsgBox, "%REG_Player1_Hotkey%"`n"%REG_Player1_Path%"`n"%REG_Player1_Icon%"`n`n"%REG_Player2_Hotkey%"`n"%REG_Player2_Path%"`n"%REG_Player2_Icon%"`n`n"%REG_Player3_Hotkey%"`n"%REG_Player3_Path%"`n"%REG_Player3_Icon%"`n`n"%REG_Player4_Hotkey%"`n"%REG_Player4_Path%"`n"%REG_Player4_Icon%"`n`n"%REG_Player5_Hotkey%"`n"%REG_Player5_Path%"`n"%REG_Player5_Icon%"`n`n"%ColorChoice%"
 	Ini_Write()	
@@ -282,13 +282,11 @@ SettingsButtonSubmit:
 Return
 
 CheckForUpdates:
-; MsgBox, %A_Temp%\PlayerPicker_Source.html
-	; UrlDownloadToFile, https://github.com/jeryjs/Player-Picker/releases, %A_Temp%\Source.html
 	DownloadFile("https://github.com/jeryjs/Player-Picker/releases", Temp "\Source.html",,, True)
+		Progress, Off
 		FileReadLine, Version, %Temp%\Source.html, 966
 		Gui +OwnDialogs
-		NewVersion := RegExReplace(Version, " ", "")
-		; MsgBox, %Version%`n%NewVersion%`n%CurrentVersion%
+		Global NewVersion := RegExReplace(Version, " ", "")
 		If !(NewVersion > CurrentVersion)
 			MsgBox, 64, Update not Found!, You are on the latest versiont: %CurrentVersion%
 		Else
@@ -297,8 +295,12 @@ CheckForUpdates:
 			{
 				Gui +OwnDialogs
 				DownloadFile("https://github.com/jeryjs/Player-Picker/releases/download/" NewVersion "/PlayerPicker.exe", Temp "\Update.exe")
+				Progress, Off
 				/*@Ahk2Exe-Keep
-					FileCopy, %Temp%\Update.exe, %A_ScriptFullPath%.exe
+					FileAppend, @echo off `n xcopy "%Temp%\Update.exe" "%A_ScriptFullPath%" /H /Y `n Start ""  "%A_ScriptFullPath%" `n DEL "`%~f0" & EXIT, %Temp%\Update.bat
+					MsgBox, 64, Update, Player Picker will now close to apply the new update. `nPlease wait for a moment.
+					Run, %Temp%\Update.bat
+					ExitApp
 				*/
 			}
 			
@@ -379,7 +381,7 @@ Return
 
 
 ;--------------Download File--------------------------------------------------
-DownloadFile(UrlToFile, SaveFileAs, Overwrite := True, UseProgressBar := True, Update := False) {
+DownloadFile(UrlToFile, SaveFileAs, Overwrite := True, UseProgressBar := True, UnknownFileSize := False) {
 		Global DownloaderTitle := PlayerPicker %CurrentVersion%
 		If (!Overwrite && FileExist(SaveFileAs))
 		  Return
@@ -387,7 +389,7 @@ DownloadFile(UrlToFile, SaveFileAs, Overwrite := True, UseProgressBar := True, U
 			WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
 			WebRequest.Open("HEAD", UrlToFile)
 			WebRequest.Send()
-			If (Update)
+			If (UnknownFileSize)
 			{
 				FinalSize := 135000
 				Progress, H80, , Checking for Update..., %DownloaderTitle%
@@ -415,7 +417,7 @@ DownloadFile(UrlToFile, SaveFileAs, Overwrite := True, UseProgressBar := True, U
 		LastSizeTick := CurrentSizeTick
 		LastSize := FileOpen(SaveFileAs, "r").Length
 		PercentDone := Round(CurrentSize/FinalSize*100)
-		If (Update)
+		If (UnknownFileSize)
 			Progress, %PercentDone%, %PercentDone%`% Done, Checking for Update...  (%Speed%), Checking for Update %DownloaderTitle% (%PercentDone%`%)
 		Else
 			Progress, %PercentDone%, %PercentDone%`% Done, Downloading...  (%Speed%), Downloading %DownloaderTitle% (%PercentDone%`%)
@@ -440,13 +442,6 @@ FileDelete, %Temp%\UnRegister Extensions.bat
 	Run, *RunAs %Temp%\UnRegister Extensions.bat, UseErrorLevel
 */
 Return
-
-
-
-
-
-
-
 
 
 
