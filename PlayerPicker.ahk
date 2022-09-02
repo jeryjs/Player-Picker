@@ -286,7 +286,7 @@ CheckForUpdates:
 		Progress, Off
 		FileReadLine, Version, %Temp%\Source.html, 966
 		Gui +OwnDialogs
-		Global NewVersion := RegExReplace(Version, " ", "")
+		NewVersion := RegExReplace(Version, " ", "")
 		If !(NewVersion > CurrentVersion)
 			MsgBox, 64, Update not Found!, You are on the latest versiont: %CurrentVersion%
 		Else
