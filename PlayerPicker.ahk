@@ -240,16 +240,15 @@ Player5:
 	Player("5")
 Return
 
-
 Player(n) {		; Run Player with additional Context
 	Gui, Hide
 	Suspend, On
+	Gui, Main: Destroy
 	Player_Path := Player%n%_Path
 	If RegExMatch(Player%n%_Path, ".exe")
 		Run, "%Player_Path%" -- "%File_Path%"
 	Else
 		MsgBox, 48, Player Picker, Add the path to the video player's exe in settings first
-	Gui, Main: Destroy
 	RegExMatch(Player_Path, "([\w\d\s]+\.exe$)", Match)
 	Loop, 10 {	; wait for the player to open
 		IfWinExist, ahk_exe %Match%
