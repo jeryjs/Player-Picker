@@ -2,9 +2,8 @@
 ;@Ahk2Exe-ExeName	Player Picker
 ;@Ahk2Exe-SetProductName	Player Picker
 ;@Ahk2Exe-SetDescription	Player Picker
-;@Ahk2Exe-SetVersion		v0.6.5-alpha
-CurrentVersion := 		   "v0.6.5-alpha"
-;@Ahk2Exe-SetOrigFilename	Player-Picker.ahk
+;@Ahk2Exe-SetVersion		v0.6.6-alpha
+CurrentVersion := 		   "v0.6.6-alpha"
 ;@Ahk2Exe-SetCompanyName	Jery
 
 ;@Ahk2Exe-SetMainIcon Assets\PlayerPicker_Main.ico
@@ -35,8 +34,8 @@ FileCreateDir, %Temp%
 Settings_Icon := % Temp "\PlayerPicker_Settings-Icon.ico"
 Main_Icon := % Temp "\PlayerPicker_Main.ico"
 
-FileInstall, Assets\PlayerPicker_Main.ico, %Main_Icon%
-FileInstall, Assets\PlayerPicker_Settings-Icon.ico, %Settings_Icon%
+FileInstall, assets\PlayerPicker_Main.ico, %Main_Icon%
+FileInstall, assets\PlayerPicker_Settings-Icon.ico, %Settings_Icon%
 
 Menu, tray, icon, %Main_Icon%
 
@@ -212,36 +211,9 @@ SetUpAssociations:
 	Gui, FTA: New
 	Gui, Font, s11, Arial
 	Gui, FTA: +OwnerSettings
-	Gui, FTA: Add, Text, x10 y15 w300 wrap, Pick the extensions you would like to associate with Player Picker
-	Gui, FTA: Add, GroupBox, x10 yp+45 w150 h280 Section, Video
-		Gui, FTA: Add, Button, xs+30 ys+30 w100 gCheckBox1V, .mp4
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox2V, .mkv
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox3V, .wmv
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox4V, .flv
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox5V, .avi
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox6V, .mov
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox7V, .webm
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox8V, .avchd
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox9V, .mts
-	Gui, FTA: Add, GroupBox, x180 ys w150 h280 Section, Audio
-		Gui, FTA: Add, Button, xs+30 ys+30 w100 gCheckBox1A, .mp3
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox2A, .m4a
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox3A, .flac
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox4A, .wav
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox5A, .wma
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox6A, .aac
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox7A, .ogg
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox8A, .pcm
-		Gui, FTA: Add, Button, xp yp+25 wp gCheckBox9A, .alac
-	
-	If A_OSVersion > 10.0.22	; Display Instructions depending on OS version
-	{
-		Gui, FTA: Add, Text, x10 yp+60 w320 wrap, Looks like you are on Windows 11... You need to set 'Player Picker' as default manually by heading to "Default Apps" and choosing 'Player Picker' as Default.
-		Gui, FTA: Add, Link, xp y+2, <a href="control /name Microsoft.DefaultPrograms /page pageDefaultProgram">Proceed to "Default Apps"</a>
-	}Else
-		Gui, FTA: Add, Text, x10 yp+60 w320 wrap, If u ever get the "Open With" Dialogue when opening a file then select "Player Picker" and 'Set it as Default'
-	
-	Gui, FTA: Add, Button, x140 y+35 gFTAButtonClose, &Close
+	Gui, FTA: Add, Button, w220 h25	gRegisterExts, Register File Associations
+	Gui, FTA: Add, Button, wp hp gUnRegisterExts, Un-Register File Associations
+	Gui, FTA: Add, Button, x100 y+15 gFTAButtonClose, &Close
 
 	Gui, FTA: Show
 Return
@@ -334,62 +306,6 @@ CheckForUpdates:
 Return
 
 ;SubRoutines for GUI 3 (FTA)
-CheckBox1V:
-	FileAssociate(".mp4")
-Return
-CheckBox2V:
-	FileAssociate(".mkv")
-Return
-CheckBox3V:
-	FileAssociate(".wmv")
-Return
-CheckBox4V:
-	FileAssociate(".flv")
-Return
-CheckBox5V:
-	FileAssociate(".avi")
-Return
-CheckBox6V:
-	FileAssociate(".mov")
-Return
-CheckBox7V:
-	FileAssociate(".webm")
-Return
-CheckBox8V:
-	FileAssociate(".avchd")
-Return
-CheckBox9V:
-	FileAssociate(".mts")
-Return
-
-CheckBox1A:
-	FileAssociate(".mp3")
-Return
-CheckBox2A:
-	FileAssociate(".m4a")
-Return
-CheckBox3A:
-	FileAssociate(".flac")
-Return
-CheckBox4A:
-	FileAssociate(".wav")
-Return
-CheckBox5A:
-	FileAssociate(".wma")
-Return
-CheckBox6A:
-	FileAssociate(".aac")
-Return
-CheckBox7A:
-	FileAssociate(".ogg")
-Return
-CheckBox8A:
-	FileAssociate(".pcm")
-Return
-CheckBox9A:
-	FileAssociate(".alac")
-Return
-
 FTAButtonClose:
 	Gui, Settings: -Disabled
 	Gui, FTA: Destroy
@@ -463,77 +379,6 @@ Return
 
 
 
-;--------------File Associate--------------------------------------------------
-FileAssociate(Ext, Label:="PlayerPicker", Cmd:="", Icon:="", batchMode:=0) {
-Cmd := A_ScriptFullPath
-Icon := A_ScriptFullPath
-; by Ħakito: https://autohotkey.com/boards/viewtopic.php?f=6&t=55638 
-; modified by Marius Șucan to AHK v1.1
-FileCreateDir, %Temp%
-
-  ; Weeds out faulty extensions, which must start with a period, and contain more than 1 character
-  iF (SubStr(Ext,1,1)!="." || StrLen(Ext)<=1)
-     Return 0
-
-  ; Weeds out faulty labels such as ".exe" which is an extension and not a label
-  iF (SubStr(Label,1,1)=".")
-     Return 0
-
-  If Label
-     RegRead, CheckLabel, HKEY_CLASSES_ROOT\%Label%, FriendlyTypeName
-
-  ; Do not allow the modification of some important registry labels
-  iF (Cmd!="" && CheckLabel)
-     Return 0
-
-  regFile := "Windows Registry Editor Version 5.00`n`n"
-  ; Note that "HKEY_CLASSES_ROOT" actually writes to "HKEY_LOCAL_MACHINE\SOFTWARE\Classes"
-  ; If the command is just a simple path, then convert it into a proper run command
-  iF (SubStr(Cmd,2,2)=":\" && FileExist(Cmd))
-     Cmd := """" Cmd """" A_Space """" "%1" """"
-  Else
-     Return 0
-
-  Cmd := StrReplace(Cmd, "\", "\\")
-  Cmd := StrReplace(Cmd, """", "\""")
-  regFile .= "[HKEY_CLASSES_ROOT\" Ext "]`n@=" """" Label """" "`n"		; Computer\HKEY_CLASSES_ROOT\.mp4
-  regFile .= "`n[HKEY_CLASSES_ROOT\" Label "]`n@=" """" Label """" "`n"		; Computer\HKEY_CLASSES_ROOT\PlayerPicker
-  regFile .= "`n[HKEY_CLASSES_ROOT\" Label "\Shell\Open\Command]`n@=" """" Cmd """" "`n"	; Computer\HKEY_CLASSES_ROOT\PlayerPicker\Shell\Open\Command
-  regFile .= "`n[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" Ext "\UserChoice]`n""ProgId""=" """" Label """" "`n"
-  regFile .= "`n[-HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" Ext "\OpenWithProgids]`n"
-  regFile .= "`n[-HKEY_CLASSES_ROOT\" Ext "\OpenWithProgids]`n`n"
-
-  If Icon
-     regFile .= "`n[HKEY_CLASSES_ROOT\" QPVslideshow "\DefaultIcon]`n@=" Icon "`n`n"
-
-  If !InStr(FileExist(Temp "\regFiles"), "D")
-  {
-     FileCreateDir, %Temp%\regFiles
-     Sleep, 1
-  }
-
-  iExt := StrReplace(Ext, ".")
-  FileDelete, %Temp%\regFiles\RegFormat%iExt%.reg
-  Sleep, 1
-  FileAppend, % regFile, %Temp%\regFiles\RegFormat%iExt%.reg
-  runTarget := "Reg Import """ Temp "\regFiles\RegFormat" iExt ".reg" """" "`n"
-  If !InStr("|WIN_7|WIN_8|WIN_8.1|WIN_VISTA|WIN_2003|WIN_XP|WIN_2000|", "|" A_OSVersion "|")
-     runTarget .= """" Temp "\SetUserFTA.exe""" A_Space Ext A_Space Label "`n"
-  FileAppend, % runTarget, %Temp%\regFiles\runThis.bat
-  If (batchMode!=1)
-  {
-     Sleep, 1
-	 /*@Ahk2Exe-Keep
-		 RunWait, *RunAs %Temp%\regFiles\runThis.bat
-		 FileDelete, %Temp%\regFiles\RegFormat%iExt%.reg
-		 FileDelete, %Temp%\regFiles\runThis.bat
-		 FileRemoveDir, %Temp%, 1
-	 */
-  }
-
-  return 1
-}
-
 ;--------------Download File--------------------------------------------------
 DownloadFile(UrlToFile, SaveFileAs, Overwrite := True, UseProgressBar := True, Update := False) {
 		Global DownloaderTitle := PlayerPicker %CurrentVersion%
@@ -579,6 +424,25 @@ DownloadFile(UrlToFile, SaveFileAs, Overwrite := True, UseProgressBar := True, U
 }
 
 
+;--------------Register Extension--------------------------------------------------
+RegisterExts:
+FileDelete, %Temp%\Register Extensions.bat
+#Include assets\Register Extensions.txt		;write a bat file to %Temp%
+/*@Ahk2Exe-Keep
+	Run, *RunAs %Temp%\Register Extensions.bat, UseErrorLevel
+*/
+Return
+
+;--------------UnRegister Extension--------------------------------------------------
+UnRegisterExts:
+FileDelete, %Temp%\UnRegister Extensions.bat
+#Include assets\UnRegister Extensions.txt	;write a bat file to %Temp%
+/*@Ahk2Exe-Keep
+	Run, *RunAs %Temp%\UnRegister Extensions.bat, UseErrorLevel
+*/
+Return
+
+
 
 
 
@@ -594,6 +458,10 @@ ExitApp:
 	FileDelete, %Settings_Icon%
 	FileDelete, %Temp%\Source.html
 	FileDelete, %Temp%\Update.exe
-	FileRemoveDir, %Temp%, 1
+	; FileDelete, %Temp%\Register Extensions.txt
+	FileDelete, %Temp%\Register Extensions.bat
+	; FileDelete, %Temp%\UnRegister Extensions.txt
+	FileDelete, %Temp%\UnRegister Extensions.bat
+	; FileRemoveDir, %Temp%, 1
 	
 ExitApp
