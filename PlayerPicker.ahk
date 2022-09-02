@@ -2,8 +2,8 @@
 ;@Ahk2Exe-ExeName	PlayerPicker
 ;@Ahk2Exe-SetProductName	PlayerPicker
 ;@Ahk2Exe-SetDescription	PlayerPicker
-;@Ahk2Exe-SetVersion		v0.7.0-alpha
-CurrentVersion := 		   "v0.7.0-alpha"
+;@Ahk2Exe-SetVersion		v0.7.1-alpha
+CurrentVersion := 		   "v0.7.1-alpha"
 ;@Ahk2Exe-SetCompanyName	Jery
 
 ;@Ahk2Exe-SetMainIcon Assets\PlayerPicker_Main.ico
@@ -53,7 +53,6 @@ Global File_Path
 Ini_Read()
 
 ; Create proper file path in case the path contains spaces
-p = %1%
 Loop, %0%
    param .= %A_Index% A_Space
 File_Path := Trim(param)
@@ -251,11 +250,12 @@ Player(n) {
 		Run, "%Player_Path%" -- "%File_Path%"
 	Else
 		MsgBox, 48, Player Picker, Add the path to the video player's exe in settings first
+	Gui, Main: Destroy
 	RegExMatch(Player_Path, "([\w\d\s]+\.exe$)", Match)
 	Loop, 10 {	; wait for the player to open
 		IfWinExist, ahk_exe %Match%
 			Break
-		Sleep, 500
+		Sleep, 300
 	}
 		If(Match = "mpv.net")
 			Sleep, 2000
@@ -391,7 +391,7 @@ DownloadFile(UrlToFile, SaveFileAs, Overwrite := True, UseProgressBar := True, U
 			WebRequest.Send()
 			If (UnknownFileSize)
 			{
-				FinalSize := 135000
+				FinalSize := 135000		; The size of the source.html file, but it can change
 				Progress, H80, , Checking for Update..., %DownloaderTitle%
 			} Else {
 				FinalSize := WebRequest.GetResponseHeader("Content-Length")
