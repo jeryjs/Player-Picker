@@ -105,7 +105,6 @@ Return
 Settings:
 Menu, tray, icon, %Settings_Icon%
 	Gui, Main: Destroy
-	; Gui, Margin, 10, 10
 	Gui, Settings: +HWNDSettingsWindow +AlwaysOnTop +LastFound
 	Gui, Settings: New
 	
@@ -162,7 +161,6 @@ Menu, tray, icon, %Settings_Icon%
 	
 	
 	Gui, Tab, 2
-		; Gui, Settings: Margin, 25, 25
 		Gui, Settings: Add, GroupBox, x25 y+5 w630 h300 Section
 		Gui, Settings: Add, Text,xs+5 ys+15, Background Color:
 		Gui, Settings: Add, ComboBox, x+10 yp r4 w120 vREG_ColorChoice Simple, %ColorChoice%||Black|White|Transparent|00FFFF|808080
@@ -242,7 +240,11 @@ Player5:
 	Player("5")
 Return
 
+<<<<<<< Updated upstream
 Player(n) {		; Run Player with Params
+=======
+Player(n) {		; Run Player with additional Context
+>>>>>>> Stashed changes
 	Gui, Hide
 	Suspend, On
 	Gui, Main: Destroy
@@ -286,7 +288,7 @@ CheckForUpdates:
 		Progress, Off
 		FileReadLine, Version, %Temp%\Source.html, 966
 		Gui +OwnDialogs
-		Global NewVersion := RegExReplace(Version, " ", "")
+		NewVersion := RegExReplace(Version, " ", "")
 		If !(NewVersion > CurrentVersion)
 			MsgBox, 64, Update not Found!, You are on the latest versiont: %CurrentVersion%
 		Else
