@@ -1,9 +1,9 @@
-;@Ahk2Exe-SetName		Player Picker
-;@Ahk2Exe-ExeName	Player Picker
-;@Ahk2Exe-SetProductName	Player Picker
-;@Ahk2Exe-SetDescription	Player Picker
-;@Ahk2Exe-SetVersion		v0.6.6-alpha
-CurrentVersion := 		   "v0.6.6-alpha"
+;@Ahk2Exe-SetName		PlayerPicker
+;@Ahk2Exe-ExeName	PlayerPicker
+;@Ahk2Exe-SetProductName	PlayerPicker
+;@Ahk2Exe-SetDescription	PlayerPicker
+;@Ahk2Exe-SetVersion		v0.6.7-alpha
+CurrentVersion := 		   "v0.6.7-alpha"
 ;@Ahk2Exe-SetCompanyName	Jery
 
 ;@Ahk2Exe-SetMainIcon Assets\PlayerPicker_Main.ico
@@ -221,9 +221,9 @@ Return
 ;-----------------------------------------------------------------
 #If
 Esc::
-GuiClose:
-GuiEscape:
-	Goto, ExitApp
+MainGuiClose:
+MainGuiEscape:
+	ExitApp()
 Return
 
 ;SubRoutines for GUI 1 (MainWindow)
@@ -261,7 +261,7 @@ Player(n) {
 			Sleep, 2000
 		ControlSend, , {Enter}, mpv.net	;fix potential bug in mpvnet
 		WinActivate, ahk_exe %Match%
-	Goto, ExitApp
+	ExitApp()
 	}
 Return
 
@@ -296,9 +296,9 @@ CheckForUpdates:
 			IfMsgBox Ok
 			{
 				Gui +OwnDialogs
-				DownloadFile("https://github.com/jeryjs/Player-Picker/releases/download/" NewVersion "/Player.Picker.exe", Temp "\Update.exe")
+				DownloadFile("https://github.com/jeryjs/Player-Picker/releases/download/" NewVersion "/PlayerPicker.exe", Temp "\Update.exe")
 				/*@Ahk2Exe-Keep
-					FileCopy, %Temp%\Update.exe, %A_ScriptFullPath%
+					FileCopy, %Temp%\Update.exe, %A_ScriptFullPath%.exe
 				*/
 			}
 			
@@ -451,16 +451,13 @@ Return
 
 
 
-ExitApp:
-
+ExitApp() {
 	FileDelete, %Main_Icon%
 	FileDelete, %Settings_Icon%
 	FileDelete, %Temp%\Source.html
 	FileDelete, %Temp%\Update.exe
-	; FileDelete, %Temp%\Register Extensions.txt
 	FileDelete, %Temp%\Register Extensions.bat
-	; FileDelete, %Temp%\UnRegister Extensions.txt
 	FileDelete, %Temp%\UnRegister Extensions.bat
-	; FileRemoveDir, %Temp%, 1
-	
+	FileRemoveDir, %Temp%, 1
 ExitApp
+}
