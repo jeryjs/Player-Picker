@@ -2,8 +2,8 @@
 ;@Ahk2Exe-ExeName	PlayerPicker
 ;@Ahk2Exe-SetProductName	PlayerPicker
 ;@Ahk2Exe-SetDescription	PlayerPicker
-;@Ahk2Exe-SetVersion		v0.7.1-alpha
-CurrentVersion := 		   "v0.7.1-alpha"
+;@Ahk2Exe-SetVersion		v0.7.2-alpha
+CurrentVersion := 		   "v0.7.2-alpha"
 ;@Ahk2Exe-SetCompanyName	Jery
 
 ;@Ahk2Exe-SetMainIcon Assets\PlayerPicker_Main.ico
@@ -240,15 +240,16 @@ Player5:
 	Player("5")
 Return
 
+
 Player(n) {		; Run Player with additional Context
 	Gui, Hide
 	Suspend, On
-	Gui, Main: Destroy
 	Player_Path := Player%n%_Path
 	If RegExMatch(Player%n%_Path, ".exe")
 		Run, "%Player_Path%" -- "%File_Path%"
 	Else
 		MsgBox, 48, Player Picker, Add the path to the video player's exe in settings first
+	Gui, Main: Destroy
 	RegExMatch(Player_Path, "([\w\d\s]+\.exe$)", Match)
 	Loop, 10 {	; wait for the player to open
 		IfWinExist, ahk_exe %Match%
@@ -280,14 +281,15 @@ SettingsButtonSave:
 Return
 
 CheckForUpdates:
+	Progress, H80, , Checking for Update..., Checking for Update
 	DownloadFile("https://github.com/jeryjs/Player-Picker/releases", Temp "\Source.html",,, True)
 		Progress, Off
 		FileReadLine, Version, %Temp%\Source.html, 966
 		Gui +OwnDialogs
 		NewVersion := RegExReplace(Version, " ", "")
-		If !(NewVersion > CurrentVersion)
-			MsgBox, 64, Update not Found!, You are on the latest versiont: %CurrentVersion%
-		Else
+		
+		If (NewVersion > CurrentVersion)
+		{
 			MsgBox, 49, Update Found!, Your Current Version is: %CurrentVersion%`nUpdate to the latest version %NewVersion%?
 			IfMsgBox Ok
 			{
@@ -301,7 +303,9 @@ CheckForUpdates:
 					ExitApp
 				*/
 			}
-			
+		}
+		Else
+			MsgBox, 64, Update not Found!, You are on the latest versiont: %CurrentVersion%
 Return
 
 ;SubRoutines for GUI 3 (FTA)
